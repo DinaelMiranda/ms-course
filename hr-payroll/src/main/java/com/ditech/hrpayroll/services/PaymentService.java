@@ -2,6 +2,7 @@ package com.ditech.hrpayroll.services;
 
 import com.ditech.hrpayroll.entities.Payment;
 import com.ditech.hrpayroll.entities.Worker;
+import com.ditech.hrpayroll.feignclients.WorkerFeignClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,22 +13,29 @@ import java.util.Map;
 
 @Service
 public class PaymentService {
+//
+//    @Value("${hr-worker.host}")
+//    private String WorkerHost;
+//
+//    @Autowired
+//    private RestTemplate restTemplate;
 
-    @Value("${hr-worker.host}")
-    private String WorkerHost;
+//    public Payment getPayment(long workerId, int days) {
+////        //Código de Requisição para o projeto hr-worker com restTemplate
+//        Map<String, String> uriVariables = new HashMap<>();
+//        uriVariables.put("id", ""+ workerId);// (""+workerId) é a conversão pra string do parâmentro workerId
+//        Worker worker = restTemplate.getForObject(WorkerHost + "/workers/{id}", Worker.class, uriVariables);
+//
+//        return new Payment(worker.getName(), worker.getDailyIncome(), days);
+//    }
 
     @Autowired
-    private RestTemplate restTemplate;
+    private WorkerFeignClients workerFeignClients;
 
     public Payment getPayment(long workerId, int days) {
-
-        //Código de Requisição para o projeto hr-worker
-        Map<String, String> uriVariables = new HashMap<>();
-        uriVariables.put("id", ""+ workerId);// (""+workerId) é a conversão pra string do parâmentro workerId
-        Worker worker = restTemplate.getForObject(WorkerHost + "/workers/{id}", Worker.class, uriVariables);
-
+       //Código de Requisição para o projeto hr-worker com feign
+        Worker worker = workerFeignClients.findById(workerId).getBody();
         return new Payment(worker.getName(), worker.getDailyIncome(), days);
     }
-
 
 }
